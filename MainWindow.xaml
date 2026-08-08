@@ -11,7 +11,7 @@
     <Grid>
         <tb:TaskbarIcon
             x:Name="TrayIcon"
-            IconSource="/icons/app.ico"
+            IconSource="/icons/tray.ico"
             ToolTipText="Import Canon Photos"
             Visibility="Visible"
             TrayLeftMouseUp="TrayIcon_LeftClick">

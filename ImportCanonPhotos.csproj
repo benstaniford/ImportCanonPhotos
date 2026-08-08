@@ -17,8 +17,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- app.ico is the dark shutter used for the exe, shortcuts and the installer. It is
+         included twice on purpose: as a WPF Resource for pack URIs, and as a loose file in
+         the output so the MSI can pick it up. -->
     <Resource Include="icons\app.ico" />
     <None Include="icons\app.ico" CopyToOutputDirectory="PreserveNewest" />
+
+    <!-- tray.ico is the light shutter for the notification area, which is dark by default
+         on Windows 11. Resource only: it is embedded in the assembly, so the installer
+         needs no extra component for it. -->
+    <Resource Include="icons\tray.ico" />
   </ItemGroup>
 
 </Project>
