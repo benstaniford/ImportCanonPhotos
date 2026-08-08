@@ -1,3 +1,4 @@
+using System.IO;
 using System.Windows;
 using ImportCanonPhotos.Core;
 using Microsoft.Win32;

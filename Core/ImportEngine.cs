@@ -1,3 +1,5 @@
+using System.IO;
+
 namespace ImportCanonPhotos.Core;
 
 /// <summary>A snapshot of import progress, marshalled to the UI by <see cref="IProgress{T}"/>.</summary>

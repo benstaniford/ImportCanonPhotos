@@ -1,4 +1,5 @@
 using ImportCanonPhotos.Core;
+using System.IO;
 using Xunit;
 
 namespace ImportCanonPhotos.Tests;

@@ -1,4 +1,5 @@
 using NReco.VideoConverter;
+using System.IO;
 
 namespace ImportCanonPhotos.Core;
 
