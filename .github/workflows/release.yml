@@ -61,7 +61,7 @@ jobs:
       - name: Update WiX Product Version
         run: |
           $version = "${{ steps.version.outputs.NUMERIC_VERSION }}"
-          $wxsPath = "SampleTrayApp.Installer/Product.wxs"
+          $wxsPath = "ImportCanonPhotos.Installer/Product.wxs"
 
           Write-Host "Updating Product.wxs with version: $version"
 
@@ -74,22 +74,22 @@ jobs:
           Get-Content $wxsPath | Select-String "define ProductVersion"
 
       - name: Restore dependencies
-        run: dotnet restore SampleTrayApp.csproj
+        run: dotnet restore ImportCanonPhotos.csproj
 
       - name: Build application
-        run: dotnet build SampleTrayApp.csproj -c Release --no-restore -p:Version=${{ steps.version.outputs.NUMERIC_VERSION }}
+        run: dotnet build ImportCanonPhotos.csproj -c Release --no-restore -p:Version=${{ steps.version.outputs.NUMERIC_VERSION }}
 
       - name: Run tests
-        run: dotnet test SampleTrayApp.Tests/SampleTrayApp.Tests.csproj -c Release --logger "console;verbosity=normal"
+        run: dotnet test ImportCanonPhotos.Tests/ImportCanonPhotos.Tests.csproj -c Release --logger "console;verbosity=normal"
 
       - name: Publish application
-        run: dotnet publish SampleTrayApp.csproj -c Release -o bin/Release/net10.0-windows/publish --no-build -p:Version=${{ steps.version.outputs.NUMERIC_VERSION }}
+        run: dotnet publish ImportCanonPhotos.csproj -c Release -o bin/Release/net10.0-windows/publish --no-build -p:Version=${{ steps.version.outputs.NUMERIC_VERSION }}
 
       - name: Build WiX Installer
         run: |
           $env:PATH += ";C:\Program Files (x86)\WiX Toolset v3.11\bin"
           Write-Host "Building WiX installer..."
-          msbuild SampleTrayApp.Installer/SampleTrayApp.Installer.wixproj /p:Configuration=Release /p:Platform=x64 /v:normal
+          msbuild ImportCanonPhotos.Installer/ImportCanonPhotos.Installer.wixproj /p:Configuration=Release /p:Platform=x64 /v:normal
           if ($LASTEXITCODE -ne 0) {
             Write-Host "WiX build failed with exit code: $LASTEXITCODE"
             exit $LASTEXITCODE
@@ -101,10 +101,10 @@ jobs:
           $version = "${{ steps.version.outputs.NUMERIC_VERSION }}"
 
           Write-Host "Looking for MSI files..."
-          Get-ChildItem SampleTrayApp.Installer -Recurse -ErrorAction SilentlyContinue | Where-Object {$_.Extension -eq ".msi"} | Format-Table FullName, Length
+          Get-ChildItem ImportCanonPhotos.Installer -Recurse -ErrorAction SilentlyContinue | Where-Object {$_.Extension -eq ".msi"} | Format-Table FullName, Length
 
-          $originalPath = "SampleTrayApp.Installer/bin/x64/Release/SampleTrayAppSetup.msi"
-          $newFileName = "SampleTrayAppSetup-v$version-x64.msi"
+          $originalPath = "ImportCanonPhotos.Installer/bin/x64/Release/ImportCanonPhotosSetup.msi"
+          $newFileName = "ImportCanonPhotosSetup-v$version-x64.msi"
 
           if (Test-Path $originalPath) {
             Write-Host "MSI file found: $originalPath"
@@ -130,17 +130,23 @@ jobs:
           ## Downloads
 
           ### Windows Installer
-          - **SampleTrayAppSetup-v$numericVersion-x64.msi** - Windows MSI installer (64-bit)
+          - **ImportCanonPhotosSetup-v$numericVersion-x64.msi** - Windows MSI installer (64-bit)
 
           ## Installation
           1. Download the MSI installer
           2. Run the installer
-          3. The application will be installed to Program Files
+          3. The application will be installed to Program Files and starts in the system tray
           4. Desktop and Start Menu shortcuts will be created
+
+          ## Usage
+          Right-click the tray icon for **Import from Camera**, **Import from Dropbox**,
+          **Preferences...** and **Show Logs**. Set your camera DCIM folder, Dropbox folder,
+          photo library and Adobe DNG Converter path under Preferences before the first import.
 
           ## System Requirements
           - **OS**: Windows 10 or later (64-bit)
           - **.NET Runtime**: .NET 10.0 Runtime (Desktop) - [Download here](https://dotnet.microsoft.com/download/dotnet/10.0)
+          - **Adobe DNG Converter** - required only for converting CR3 raw files to DNG
           "@
 
           Set-Content -Path "release_notes.md" -Value $releaseNotes
@@ -148,7 +154,7 @@ jobs:
           if (gh release view "$version" 2>$null) {
             Write-Host "Release $version already exists"
           } else {
-            gh release create "$version" --title "Sample Tray App $version" --notes-file "release_notes.md" --latest
+            gh release create "$version" --title "Import Canon Photos $version" --notes-file "release_notes.md" --latest
           }
 
       - name: Upload MSI Installer
@@ -158,7 +164,7 @@ jobs:
           $version = "${{ steps.version.outputs.VERSION }}"
           $numericVersion = "${{ steps.version.outputs.NUMERIC_VERSION }}"
 
-          $msiFile = "SampleTrayAppSetup-v$numericVersion-x64.msi"
+          $msiFile = "ImportCanonPhotosSetup-v$numericVersion-x64.msi"
           Write-Host "Uploading MSI installer to release..."
           gh release upload $version $msiFile --clobber
           Write-Host "MSI installer uploaded successfully"

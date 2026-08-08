@@ -1,0 +1,57 @@
+<Window x:Class="ImportCanonPhotos.Ui.ProgressWindow"
+        x:ClassModifier="internal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Importing"
+        Height="210" Width="520"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        ShowInTaskbar="True">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="PhaseText"
+                   Grid.Row="0"
+                   FontWeight="Bold"
+                   Text="Starting..."/>
+
+        <ProgressBar x:Name="PhaseBar"
+                     Grid.Row="1"
+                     Height="18"
+                     Margin="0,6,0,0"
+                     Minimum="0" Maximum="1" Value="0"/>
+
+        <TextBlock x:Name="CurrentFileText"
+                   Grid.Row="2"
+                   Margin="0,6,0,0"
+                   TextTrimming="CharacterEllipsis"
+                   Foreground="#666"
+                   Text=""/>
+
+        <TextBlock x:Name="OverallText"
+                   Grid.Row="3"
+                   Margin="0,14,0,0"
+                   Text="Overall"/>
+
+        <ProgressBar x:Name="OverallBar"
+                     Grid.Row="4"
+                     Height="18"
+                     Margin="0,6,0,0"
+                     Minimum="0" Maximum="1" Value="0"/>
+
+        <Button x:Name="CancelButton"
+                Grid.Row="5"
+                Content="Cancel"
+                Width="90" Height="26"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Click="Cancel_Click"/>
+    </Grid>
+</Window>

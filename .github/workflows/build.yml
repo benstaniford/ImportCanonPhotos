@@ -1,0 +1,113 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - 'v*.*.*'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      # Never build the .sln: the .NET SDK cannot load a WiX .wixproj.
+      - name: Restore dependencies
+        run: dotnet restore ImportCanonPhotos.csproj
+
+      - name: Build application
+        run: dotnet build ImportCanonPhotos.csproj -c Release --no-restore
+
+      - name: Run tests
+        run: dotnet test ImportCanonPhotos.Tests/ImportCanonPhotos.Tests.csproj -c Release --logger "console;verbosity=normal"
+
+      # The WiX file list is hand-maintained (DoNotHarvest=True), so a forgotten
+      # dependency produces a green build and an MSI that crashes on first use.
+      - name: Verify installer payload
+        run: |
+          $outputDir = "bin/Release/net10.0-windows"
+          $wxs = "ImportCanonPhotos.Installer/Product.wxs"
+
+          $declared = Select-String -Path $wxs -Pattern 'Source(?:File)?="\$\(var\.ImportCanonPhotos\.TargetDir\)([^"]+)"' -AllMatches |
+            ForEach-Object { $_.Matches } |
+            ForEach-Object { $_.Groups[1].Value } |
+            Sort-Object -Unique
+
+          Write-Host "Declared in Product.wxs:"
+          $declared | ForEach-Object { Write-Host "  $_" }
+
+          $missing = @()
+          foreach ($file in $declared) {
+            if (-not (Test-Path (Join-Path $outputDir $file))) { $missing += $file }
+          }
+
+          $declaredLeaves = $declared | ForEach-Object { Split-Path $_ -Leaf }
+          $undeclared = Get-ChildItem $outputDir -Filter *.dll |
+            Where-Object { $declaredLeaves -notcontains $_.Name } |
+            ForEach-Object { $_.Name }
+
+          if ($undeclared) {
+            Write-Host "::warning::DLLs in the build output that the MSI does not ship: $($undeclared -join ', ')"
+          }
+
+          if ($missing) {
+            Write-Host "::error::Declared in Product.wxs but absent from the build output: $($missing -join ', ')"
+            exit 1
+          }
+
+          Write-Host "Installer payload verified."
+
+  installer:
+    runs-on: windows-latest
+    needs: build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup WiX Toolset
+        run: |
+          choco install wixtoolset -y --no-progress
+          $env:PATH += ";C:\Program Files (x86)\WiX Toolset v3.11\bin"
+          echo "PATH=$env:PATH" >> $env:GITHUB_ENV
+
+      - name: Build application
+        run: dotnet build ImportCanonPhotos.csproj -c Release
+
+      - name: Build WiX Installer
+        run: |
+          $env:PATH += ";C:\Program Files (x86)\WiX Toolset v3.11\bin"
+          msbuild ImportCanonPhotos.Installer/ImportCanonPhotos.Installer.wixproj /p:Configuration=Release /p:Platform=x64 /v:normal
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload MSI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ImportCanonPhotosSetup-msi
+          path: ImportCanonPhotos.Installer/bin/x64/Release/ImportCanonPhotosSetup.msi
+          if-no-files-found: error

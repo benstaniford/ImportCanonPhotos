@@ -1,9 +1,9 @@
-<Window x:Class="SampleTrayApp.MainWindow"
+<Window x:Class="ImportCanonPhotos.MainWindow"
         x:ClassModifier="internal"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:tb="clr-namespace:H.NotifyIcon;assembly=H.NotifyIcon.Wpf"
-        Title="Sample Tray App" Height="0" Width="0"
+        Title="Import Canon Photos" Height="0" Width="0"
         ShowInTaskbar="False"
         WindowStyle="None"
         ResizeMode="NoResize"
@@ -12,13 +12,18 @@
         <tb:TaskbarIcon
             x:Name="TrayIcon"
             IconSource="/icons/app.ico"
-            ToolTipText="Sample Tray App"
+            ToolTipText="Import Canon Photos"
             Visibility="Visible"
             TrayLeftMouseUp="TrayIcon_LeftClick">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="About" Click="About_Click"/>
+                    <MenuItem x:Name="ImportCameraMenuItem" Header="Import from Camera" Click="ImportFromCamera_Click"/>
+                    <MenuItem x:Name="ImportDropboxMenuItem" Header="Import from Dropbox" Click="ImportFromDropbox_Click"/>
                     <Separator/>
+                    <MenuItem Header="Preferences..." Click="Preferences_Click"/>
+                    <MenuItem Header="Show Logs" Click="ShowLogs_Click"/>
+                    <Separator/>
+                    <MenuItem Header="About" Click="About_Click"/>
                     <MenuItem Header="Exit" Click="Exit_Click"/>
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>

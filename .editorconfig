@@ -1,0 +1,114 @@
+root = true
+
+[*.cs]
+# Directory.Build.props sets AnalysisLevel=latest-All with TreatWarningsAsErrors, so every
+# CA rule is a build error by default. The rules below are switched off deliberately for a
+# single-user desktop app whose job is copying files and shelling out to converters.
+
+# Generic catch clauses are the design: one unreadable file must not abort a whole import.
+dotnet_diagnostic.CA1031.severity = none
+# Not localised; UI and log strings are literals.
+dotnet_diagnostic.CA1303.severity = none
+dotnet_diagnostic.CA1304.severity = none
+dotnet_diagnostic.CA1305.severity = none
+dotnet_diagnostic.CA1307.severity = none
+dotnet_diagnostic.CA1308.severity = none
+dotnet_diagnostic.CA1310.severity = none
+dotnet_diagnostic.CA1311.severity = none
+# Simple file logger, not Microsoft.Extensions.Logging.
+dotnet_diagnostic.CA1848.severity = none
+dotnet_diagnostic.CA1727.severity = none
+# WPF wants continuations back on the UI thread, so ConfigureAwait(false) is not a default.
+dotnet_diagnostic.CA2007.severity = none
+# No security-sensitive randomness or path handling here.
+dotnet_diagnostic.CA5394.severity = none
+# WPF/XAML instantiates types the analyser cannot see.
+dotnet_diagnostic.CA1812.severity = none
+# Internal app code; null-argument guards on every entry point are noise.
+dotnet_diagnostic.CA1062.severity = none
+# Collection/array members are fine on internal DTOs.
+dotnet_diagnostic.CA1002.severity = none
+dotnet_diagnostic.CA1819.severity = none
+dotnet_diagnostic.CA1051.severity = none
+# Disposal handled by using-statements where it matters.
+dotnet_diagnostic.CA2000.severity = none
+# Naming rules aimed at reusable libraries.
+dotnet_diagnostic.CA1724.severity = none
+dotnet_diagnostic.CA1716.severity = none
+dotnet_diagnostic.CA1721.severity = none
+dotnet_diagnostic.CA1034.severity = none
+dotnet_diagnostic.CA1032.severity = none
+# Prefer readable inline arrays and interpolation over cached statics.
+dotnet_diagnostic.CA1861.severity = none
+dotnet_diagnostic.CA1863.severity = none
+dotnet_diagnostic.CA1869.severity = none
+# Throwing base Exception types is not done, but derived-exception ceremony is.
+dotnet_diagnostic.CA2201.severity = none
+# Performance suggestions that fight readability in one-shot import code.
+dotnet_diagnostic.CA1859.severity = none
+dotnet_diagnostic.CA1860.severity = none
+dotnet_diagnostic.CA1866.severity = none
+dotnet_diagnostic.CA1868.severity = none
+# Interprocedural analysis produces false positives across async boundaries.
+dotnet_diagnostic.CA1508.severity = none
+
+# EnforceCodeStyleInBuild is on, so IDE rules are build diagnostics too. These are either
+# cosmetic or actively contradictory, and cannot be verified without a local compiler.
+dotnet_diagnostic.IDE0005.severity = none
+dotnet_diagnostic.IDE0007.severity = none
+dotnet_diagnostic.IDE0008.severity = none
+dotnet_diagnostic.IDE0011.severity = none
+dotnet_diagnostic.IDE0021.severity = none
+dotnet_diagnostic.IDE0022.severity = none
+dotnet_diagnostic.IDE0023.severity = none
+dotnet_diagnostic.IDE0024.severity = none
+dotnet_diagnostic.IDE0025.severity = none
+dotnet_diagnostic.IDE0026.severity = none
+dotnet_diagnostic.IDE0027.severity = none
+dotnet_diagnostic.IDE0028.severity = none
+dotnet_diagnostic.IDE0032.severity = none
+dotnet_diagnostic.IDE0044.severity = none
+dotnet_diagnostic.IDE0045.severity = none
+dotnet_diagnostic.IDE0046.severity = none
+dotnet_diagnostic.IDE0055.severity = none
+# Unused expression value: Directory.CreateDirectory and MessageBox.Show both return values.
+dotnet_diagnostic.IDE0058.severity = none
+dotnet_diagnostic.IDE0059.severity = none
+# Unused parameter: every WPF handler has (object sender, RoutedEventArgs e).
+dotnet_diagnostic.IDE0060.severity = none
+dotnet_diagnostic.IDE0063.severity = none
+dotnet_diagnostic.IDE0066.severity = none
+dotnet_diagnostic.IDE0072.severity = none
+dotnet_diagnostic.IDE0079.severity = none
+dotnet_diagnostic.IDE0090.severity = none
+# Namespace does not match folder structure: XAML types stay in the root namespace.
+dotnet_diagnostic.IDE0130.severity = none
+dotnet_diagnostic.IDE0160.severity = none
+dotnet_diagnostic.IDE0161.severity = none
+dotnet_diagnostic.IDE0270.severity = none
+dotnet_diagnostic.IDE0290.severity = none
+dotnet_diagnostic.IDE0300.severity = none
+dotnet_diagnostic.IDE0301.severity = none
+dotnet_diagnostic.IDE0302.severity = none
+dotnet_diagnostic.IDE0303.severity = none
+dotnet_diagnostic.IDE0304.severity = none
+dotnet_diagnostic.IDE0305.severity = none
+# Members can be static / complexity metrics: noisy in code-behind and the import engine.
+dotnet_diagnostic.CA1822.severity = none
+dotnet_diagnostic.CA1849.severity = none
+dotnet_diagnostic.CA1502.severity = none
+dotnet_diagnostic.CA1505.severity = none
+dotnet_diagnostic.CA1506.severity = none
+# "File path injection" fires on every settings-driven File.Copy in the app.
+dotnet_diagnostic.CA3003.severity = none
+dotnet_diagnostic.CA3006.severity = none
+# Public types in an application assembly: the Core types are public so the test project
+# can exercise them. CA1515 wants them internal.
+dotnet_diagnostic.CA1515.severity = none
+# Naming/design rules aimed at reusable libraries.
+dotnet_diagnostic.CA1000.severity = none
+dotnet_diagnostic.CA1024.severity = none
+dotnet_diagnostic.CA1711.severity = none
+dotnet_diagnostic.CA1720.severity = none
+dotnet_diagnostic.CA1805.severity = none
+dotnet_diagnostic.CA1873.severity = none

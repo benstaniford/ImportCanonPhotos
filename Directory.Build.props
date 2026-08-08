@@ -1,5 +1,7 @@
 <Project>
-  <PropertyGroup>
+  <!-- Scoped to C# projects: the WiX .wixproj also picks this file up, and
+       TreatWarningsAsErrors there turns candle/light ICE warnings into build failures. -->
+  <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.csproj'">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AnalysisLevel>latest-All</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
