@@ -64,6 +64,13 @@
               KeyPath="yes" />
       </Component>
 
+      <!-- Transitive dependency of H.NotifyIcon.Wpf -->
+      <Component Id="HGeneratedIcons" Guid="{9D87FE08-B209-4815-BFF9-331B538EFA72}">
+        <File Id="HGeneratedIconsDll"
+              Source="$(var.ImportCanonPhotos.TargetDir)H.GeneratedIcons.System.Drawing.dll"
+              KeyPath="yes" />
+      </Component>
+
       <!-- NuGet Dependencies - MetadataExtractor (EXIF date reading) -->
       <Component Id="MetadataExtractor" Guid="{AF35D91A-E233-4DD1-8DAB-60178F4351D6}">
         <File Id="MetadataExtractorDll"
@@ -146,6 +153,7 @@
       <ComponentRef Id="IconsComponent" />
       <ComponentRef Id="HNotifyIcon" />
       <ComponentRef Id="HNotifyIconCore" />
+      <ComponentRef Id="HGeneratedIcons" />
       <ComponentRef Id="MetadataExtractor" />
       <ComponentRef Id="XmpCore" />
       <ComponentRef Id="NRecoVideoConverter" />
