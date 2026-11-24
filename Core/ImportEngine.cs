@@ -90,7 +90,7 @@ public sealed class ImportEngine
             {
                 var files = Directory.GetFiles(source, $"*.{extension}", SearchOption.TopDirectoryOnly);
                 BeginPhase($"Importing {extension.ToUpperInvariant()} files", files.Length);
-                ImportFiles(files, outputRoot, result, cancellationToken);
+                ImportFiles(files, outputRoot, result, cancellationToken, preferFileNameDate: true);
             }
 
             if (_settings.DeleteSourceAfterImport)
@@ -261,7 +261,8 @@ public sealed class ImportEngine
         IReadOnlyList<string> files,
         string outputRoot,
         ImportResult result,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        bool preferFileNameDate = false)
     {
         var copied = new List<string>();
 
@@ -272,7 +273,11 @@ public sealed class ImportEngine
 
             try
             {
-                var date = PhotoDate.GetDateFromImage(file);
+                // Dropbox files can be re-synced with a fresh timestamp and no usable EXIF,
+                // but their names carry the capture date, so that wins.
+                var date = preferFileNameDate
+                    ? PhotoDate.GetDateFromFileNameOrImage(file)
+                    : PhotoDate.GetDateFromImage(file);
                 var folder = OutputPathBuilder.CreateOutputFolder(outputRoot, file, date);
                 var destination = Path.Combine(folder, Path.GetFileName(file));
 

@@ -1,12 +1,13 @@
 using System.Globalization;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace ImportCanonPhotos.Core;
 
 /// <summary>
 /// Works out which day a file belongs to, matching the original script's behaviour.
 /// </summary>
-public static class PhotoDate
+public static partial class PhotoDate
 {
     /// <summary>
     /// The original matched the EXIF tag whose display name is exactly "Date/Time"
@@ -14,6 +15,55 @@ public static class PhotoDate
     /// folders they always have.
     /// </summary>
     private const string DateTimeTagName = "Date/Time";
+
+    /// <summary>
+    /// Dropbox Camera Uploads names files "yyyy-MM-dd HH.mm.ss.ext", with "-1", "-2"...
+    /// appended on collisions. That name is set from the capture time when Dropbox uploads
+    /// the file, so it survives files being re-synced with a fresh timestamp and no EXIF.
+    /// </summary>
+    [GeneratedRegex(@"^(?<date>\d{4}-\d{2}-\d{2})(?: (?<time>\d{2}\.\d{2}\.\d{2}))?(?!\d)")]
+    private static partial Regex FileNameDatePattern();
+
+    /// <summary>
+    /// For Dropbox uploads: the date in the filename wins, then EXIF, then file creation time.
+    /// </summary>
+    public static DateTime GetDateFromFileNameOrImage(string file)
+    {
+        return TryParseFileNameDate(Path.GetFileName(file), out var fileNameDate)
+            ? fileNameDate
+            : GetDateFromImage(file);
+    }
+
+    internal static bool TryParseFileNameDate(string? fileName, out DateTime value)
+    {
+        value = default;
+
+        if (string.IsNullOrEmpty(fileName))
+        {
+            return false;
+        }
+
+        var match = FileNameDatePattern().Match(fileName);
+        if (!match.Success)
+        {
+            return false;
+        }
+
+        var time = match.Groups["time"];
+        return time.Success
+            ? DateTime.TryParseExact(
+                $"{match.Groups["date"].Value} {time.Value}",
+                "yyyy-MM-dd HH.mm.ss",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out value)
+            : DateTime.TryParseExact(
+                match.Groups["date"].Value,
+                "yyyy-MM-dd",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out value);
+    }
 
     public static DateTime GetDateFromImage(string imageFile)
     {
